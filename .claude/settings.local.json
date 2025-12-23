@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm test)",
+      "Bash(npm run build:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run playground:*)",
+      "Bash(npm run example:*)"
+    ]
+  }
+}

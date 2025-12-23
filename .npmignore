@@ -1,0 +1,22 @@
+# Source files (types are in dist/)
+src/
+
+# Config files
+tsconfig.json
+tsup.config.ts
+.releaserc.json
+
+# GitHub
+.github/
+
+# Tests
+__tests__/
+*.test.ts
+coverage/
+
+# Dev files
+.gitignore
+.editorconfig
+
+# Examples
+examples/

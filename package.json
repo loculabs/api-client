@@ -1,0 +1,70 @@
+{
+  "name": "@locu/api-client",
+  "version": "0.0.0-development",
+  "description": "TypeScript client for the Locu REST API",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "example": "tsx examples/basic.ts",
+    "generate:dev": "openapi-typescript http://localhost:8080/api/v1/openapi.json -o src/generated/api.ts",
+    "generate:prod": "openapi-typescript https://api.locu.app/api/v1/openapi.json -o src/generated/api.ts",
+    "generate": "npm run generate:prod",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "locu",
+    "api",
+    "client",
+    "typescript",
+    "rest",
+    "tasks",
+    "productivity"
+  ],
+  "author": "Locu Labs <support@locu.app>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/loculabs/api-client.git"
+  },
+  "homepage": "https://locu.app/docs/api",
+  "bugs": {
+    "url": "https://github.com/loculabs/api-client/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@types/node": "^20.10.0",
+    "openapi-typescript": "^7.4.4",
+    "semantic-release": "24.2.9",
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
