@@ -9,7 +9,9 @@
       "Bash(npm run example:*)",
       "Bash(npm run generate:dev:*)",
       "Bash(npm run format:*)",
-      "Bash(npm run generate:client:*)"
+      "Bash(npm run generate:client:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
