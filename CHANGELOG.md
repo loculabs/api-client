@@ -1,3 +1,10 @@
+# 1.0.0 (2025-12-31)
+
+
+### Features
+
+* initial release of @locu/api-client ([a339860](https://github.com/loculabs/api-client/commit/a3398608245e493b8cadf92580653a532e075572))
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
