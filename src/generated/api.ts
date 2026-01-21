@@ -4,6 +4,90 @@
  */
 
 export interface paths {
+    "/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get current user
+         * @description Returns information about the authenticated user and workspace associated with the API token.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successful response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MeResponse"];
+                    };
+                };
+                /** @description Bad request - validation error */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized - invalid or missing API key */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Rate limit exceeded */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/notes": {
         parameters: {
             query?: never;
@@ -3327,6 +3411,17 @@ export interface components {
             type: "jira";
         };
         Task: components["schemas"]["LocuTask"] | components["schemas"]["LinearTask"] | components["schemas"]["JiraTask"];
+        MeResponse: {
+            /** @description Email of the authenticated user */
+            email: string;
+            /** @description Name of the workspace */
+            workspaceName: string;
+        };
+        ErrorResponse: {
+            error: string;
+            message: string;
+            code?: string;
+        };
         Note: {
             id: string;
             text: string;
@@ -3408,11 +3503,6 @@ export interface components {
             data: components["schemas"]["Note"][];
             nextCursor: string | null;
             hasMore: boolean;
-        };
-        ErrorResponse: {
-            error: string;
-            message: string;
-            code?: string;
         };
         CreateNoteRequest: {
             /**

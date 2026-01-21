@@ -23,7 +23,7 @@ interface CustomMethod {
   method: HttpMethod
   path: string
   description: string
-  params?: string
+  /** Request type - used as query params for GET, body for POST/PUT/PATCH */
   request?: string
   response: string
   optional?: boolean
@@ -50,6 +50,8 @@ interface ResourceConfig {
   createResponse?: string
   customMethods?: CustomMethod[]
   nested?: NestedResource[]
+  /** If true, only generates a single GET method (no CRUD) */
+  singleton?: boolean
 }
 
 // ============================================================================
@@ -58,6 +60,50 @@ interface ResourceConfig {
 // ============================================================================
 
 const RESOURCES: ResourceConfig[] = [
+  {
+    name: "me",
+    basePath: "/me",
+    entity: "MeResponse",
+    singleton: true,
+  },
+  {
+    name: "timer",
+    basePath: "/timer",
+    entity: "TimerState",
+    singleton: true,
+    customMethods: [
+      {
+        name: "start",
+        method: "post",
+        path: "/timer/start",
+        description: "Start a new timer",
+        request: "StartTimerRequest",
+        response: "TimerState",
+        optional: true,
+      },
+      {
+        name: "pause",
+        method: "post",
+        path: "/timer/pause",
+        description: "Pause the running timer",
+        response: "TimerState",
+      },
+      {
+        name: "continue",
+        method: "post",
+        path: "/timer/continue",
+        description: "Resume a paused timer",
+        response: "TimerState",
+      },
+      {
+        name: "stop",
+        method: "post",
+        path: "/timer/stop",
+        description: "Stop timer and save sessions",
+        response: "StopTimerResponse",
+      },
+    ],
+  },
   {
     name: "tasks",
     basePath: "/tasks",
@@ -71,7 +117,7 @@ const RESOURCES: ResourceConfig[] = [
         method: "get",
         path: "/tasks/sections",
         description: "Get tasks organized by section (today, sooner, later)",
-        params: "TaskSectionsParams",
+        request: "TaskSectionsParams",
         response: "TaskSectionsResponse",
       },
       {
@@ -79,7 +125,7 @@ const RESOURCES: ResourceConfig[] = [
         method: "get",
         path: "/tasks/{id}/subtasks",
         description: "List subtasks for a task",
-        params: "SubtaskListParams",
+        request: "SubtaskListParams",
         response: "PaginatedResponse<Task>",
       },
       {
@@ -149,54 +195,12 @@ const RESOURCES: ResourceConfig[] = [
         method: "get",
         path: "/webhooks/{id}/deliveries",
         description: "List deliveries for a webhook",
-        params: "PaginationParams",
+        request: "PaginationParams",
         response: "PaginatedResponse<WebhookDelivery>",
       },
     ],
   },
 ]
-
-const TIMER_CONFIG = {
-  methods: [
-    {
-      name: "get",
-      method: "get" as const,
-      path: "/timer",
-      description: "Get current timer state",
-      response: "TimerState",
-    },
-    {
-      name: "start",
-      method: "post" as const,
-      path: "/timer/start",
-      description: "Start a new timer",
-      request: "StartTimerRequest",
-      response: "TimerState",
-      optional: true,
-    },
-    {
-      name: "pause",
-      method: "post" as const,
-      path: "/timer/pause",
-      description: "Pause the running timer",
-      response: "TimerState",
-    },
-    {
-      name: "continue",
-      method: "post" as const,
-      path: "/timer/continue",
-      description: "Resume a paused timer",
-      response: "TimerState",
-    },
-    {
-      name: "stop",
-      method: "post" as const,
-      path: "/timer/stop",
-      description: "Stop timer and save sessions",
-      response: "StopTimerResponse",
-    },
-  ],
-}
 
 // ============================================================================
 // CODE GENERATION
@@ -258,6 +262,7 @@ function generateCrudMethods(resource: ResourceConfig): string {
 function generateCustomMethods(resource: ResourceConfig): string {
   if (!resource.customMethods?.length) return ""
   const lines: string[] = [""]
+  const isQueryMethod = (m: string) => m === "get" || m === "delete"
 
   for (const method of resource.customMethods) {
     lines.push(`      /** ${method.description} */`)
@@ -272,13 +277,23 @@ function generateCustomMethods(resource: ResourceConfig): string {
       )
     } else if (method.path.includes("{id}")) {
       const pathWithoutId = method.path.replace("{id}", "${id}")
-      if (method.params) {
+      if (method.request && isQueryMethod(method.method)) {
+        // GET/DELETE with query params
         lines.push(`      ${method.name}: (`)
         lines.push(`        id: string,`)
-        lines.push(`        params: ${method.params} = {},`)
+        lines.push(`        params: ${method.request} = {},`)
         lines.push(`      ): Promise<${method.response}> =>`)
         lines.push(
           `        request("${method.method.toUpperCase()}", \`${pathWithoutId}\${buildQueryString(params)}\`),`
+        )
+      } else if (method.request) {
+        // POST/PUT/PATCH with body
+        lines.push(`      ${method.name}: (`)
+        lines.push(`        id: string,`)
+        lines.push(`        data: ${method.request},`)
+        lines.push(`      ): Promise<${method.response}> =>`)
+        lines.push(
+          `        request("${method.method.toUpperCase()}", \`${pathWithoutId}\`, data),`
         )
       } else {
         lines.push(
@@ -289,12 +304,22 @@ function generateCustomMethods(resource: ResourceConfig): string {
         )
       }
     } else {
-      if (method.params) {
+      if (method.request && isQueryMethod(method.method)) {
+        // GET/DELETE with query params
         lines.push(
-          `      ${method.name}: (params: ${method.params} = {}): Promise<${method.response}> =>`
+          `      ${method.name}: (params: ${method.request} = {}): Promise<${method.response}> =>`
         )
         lines.push(
           `        request("${method.method.toUpperCase()}", \`${method.path}\${buildQueryString(params)}\`),`
+        )
+      } else if (method.request) {
+        // POST/PUT/PATCH with body
+        const opt = method.optional ? "?" : ""
+        lines.push(
+          `      ${method.name}: (data${opt}: ${method.request}): Promise<${method.response}> =>`
+        )
+        lines.push(
+          `        request("${method.method.toUpperCase()}", "${method.path}", data),`
         )
       } else {
         lines.push(`      ${method.name}: (): Promise<${method.response}> =>`)
@@ -376,8 +401,56 @@ function generateNestedResource(
   return lines.join("\n")
 }
 
+function generateSingletonMethods(resource: ResourceConfig): string {
+  const lines: string[] = []
+
+  // GET method for the singleton
+  lines.push(`      /** Get current ${resource.name} */`)
+  lines.push(`      get: (): Promise<${resource.entity}> =>`)
+  lines.push(`        request("GET", "${resource.basePath}"),`)
+
+  // Custom methods
+  for (const method of resource.customMethods || []) {
+    lines.push("")
+    lines.push(`      /** ${method.description} */`)
+    if (method.request) {
+      if (method.optional) {
+        lines.push(
+          `      ${method.name}: (data?: ${method.request}): Promise<${method.response}> =>`
+        )
+      } else {
+        lines.push(
+          `      ${method.name}: (data: ${method.request}): Promise<${method.response}> =>`
+        )
+      }
+      lines.push(
+        `        request("${method.method.toUpperCase()}", "${method.path}", data),`
+      )
+    } else {
+      lines.push(`      ${method.name}: (): Promise<${method.response}> =>`)
+      lines.push(
+        `        request("${method.method.toUpperCase()}", "${method.path}"),`
+      )
+    }
+  }
+
+  return lines.join("\n")
+}
+
 function generateResource(resource: ResourceConfig): string {
   const lines: string[] = []
+
+  // Singleton resources (e.g., me, timer) - always an object with get() method
+  if (resource.singleton) {
+    lines.push(
+      `    // ============ ${resource.name.charAt(0).toUpperCase() + resource.name.slice(1)} ============`
+    )
+    lines.push(`    ${resource.name}: {`)
+    lines.push(generateSingletonMethods(resource))
+    lines.push(`    },`)
+    return lines.join("\n")
+  }
+
   lines.push(
     `    // ============ ${resource.name.charAt(0).toUpperCase() + resource.name.slice(1)} ============`
   )
@@ -392,43 +465,6 @@ function generateResource(resource: ResourceConfig): string {
     }
   }
 
-  lines.push(`    },`)
-  return lines.join("\n")
-}
-
-function generateTimer(): string {
-  const lines: string[] = []
-  lines.push(`    // ============ Timer ============`)
-  lines.push(`    timer: {`)
-
-  for (const method of TIMER_CONFIG.methods) {
-    lines.push(`      /** ${method.description} */`)
-    if (method.request) {
-      if (method.optional) {
-        lines.push(
-          `      ${method.name}: (data?: ${method.request}): Promise<${method.response}> =>`
-        )
-        lines.push(
-          `        request("${method.method.toUpperCase()}", "${method.path}", data),`
-        )
-      } else {
-        lines.push(
-          `      ${method.name}: (data: ${method.request}): Promise<${method.response}> =>`
-        )
-        lines.push(
-          `        request("${method.method.toUpperCase()}", "${method.path}", data),`
-        )
-      }
-    } else {
-      lines.push(`      ${method.name}: (): Promise<${method.response}> =>`)
-      lines.push(
-        `        request("${method.method.toUpperCase()}", "${method.path}"),`
-      )
-    }
-    lines.push("")
-  }
-
-  lines.pop()
   lines.push(`    },`)
   return lines.join("\n")
 }
@@ -453,13 +489,13 @@ function generateImports(): string {
         types.add(method.response)
       }
       const genericMatch = method.response.match(/<(\w+)>/)
-      if (genericMatch) types.add(genericMatch[1])
+      if (genericMatch && genericMatch[1]) types.add(genericMatch[1])
       if (
-        method.params &&
-        !method.params.startsWith("Omit") &&
-        !method.params.startsWith("{")
+        method.request &&
+        !method.request.startsWith("Omit") &&
+        !method.request.startsWith("{")
       ) {
-        types.add(method.params)
+        types.add(method.request)
       }
     }
 
@@ -468,12 +504,6 @@ function generateImports(): string {
       if (nested.createRequest) types.add(nested.createRequest)
       if (nested.updateRequest) types.add(nested.updateRequest)
     }
-  }
-
-  for (const method of TIMER_CONFIG.methods) {
-    if (method.response && !method.response.startsWith("{"))
-      types.add(method.response)
-    if (method.request) types.add(method.request)
   }
 
   types.add("PaginatedResponse")
@@ -486,7 +516,6 @@ function generateImports(): string {
 
 function generateClient(): string {
   const resourceCode = RESOURCES.map(generateResource).join("\n\n")
-  const timerCode = generateTimer()
 
   return `${generateImports()}
 
@@ -567,8 +596,6 @@ export const createLocuClient = (config: LocuClientConfig) => {
 
   return {
 ${resourceCode}
-
-${timerCode}
   }
 }
 
@@ -600,24 +627,28 @@ function getConfiguredPaths(): Set<string> {
 
   for (const resource of RESOURCES) {
     paths.add(resource.basePath)
-    paths.add(`${resource.basePath}/{id}`)
 
-    for (const method of resource.customMethods || []) {
-      paths.add(method.path)
-    }
+    // Singletons can have custom methods but no {id} routes
+    if (resource.singleton) {
+      for (const method of resource.customMethods || []) {
+        paths.add(method.path)
+      }
+    } else {
+      paths.add(`${resource.basePath}/{id}`)
 
-    for (const nested of resource.nested || []) {
-      paths.add(`${resource.basePath}/{id}${nested.basePath}`)
-      if (nested.idParam) {
-        paths.add(
-          `${resource.basePath}/{id}${nested.basePath}/{${nested.idParam}}`
-        )
+      for (const method of resource.customMethods || []) {
+        paths.add(method.path)
+      }
+
+      for (const nested of resource.nested || []) {
+        paths.add(`${resource.basePath}/{id}${nested.basePath}`)
+        if (nested.idParam) {
+          paths.add(
+            `${resource.basePath}/{id}${nested.basePath}/{${nested.idParam}}`
+          )
+        }
       }
     }
-  }
-
-  for (const method of TIMER_CONFIG.methods) {
-    paths.add(method.path)
   }
 
   return paths

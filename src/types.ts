@@ -73,6 +73,9 @@ export type DeleteWebhookResponse =
 // Common
 export type ErrorResponse = components["schemas"]["ErrorResponse"]
 
+// Me
+export type MeResponse = components["schemas"]["MeResponse"]
+
 // Convenience type aliases used by the client
 export type ApiError = ErrorResponse
 
