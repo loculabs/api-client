@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/loculabs/api-client/compare/v1.0.0...v1.1.0) (2026-01-21)
+
+
+### Features
+
+* add /me endpoint and refactor client generator ([20dde23](https://github.com/loculabs/api-client/commit/20dde231a71e45f366f3ed1a2501dfe9c6432ce9))
+
 # 1.0.0 (2025-12-31)
 
 
