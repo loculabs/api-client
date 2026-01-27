@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/loculabs/api-client/compare/v1.2.0...v1.3.0) (2026-01-27)
+
+
+### Features
+
+* **timer:** add cancel endpoint ([009fee0](https://github.com/loculabs/api-client/commit/009fee0bb6e157eb602d790878f1fc2a77d12eaf))
+
 # [1.2.0](https://github.com/loculabs/api-client/compare/v1.1.0...v1.2.0) (2026-01-27)
 
 
