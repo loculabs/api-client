@@ -15,5 +15,4 @@ export type {
   VerifyWebhookOptions,
 } from "./webhook"
 
-// Types - re-export everything from types module
-export type * from "./types"
+export type * from "./generated/api"
