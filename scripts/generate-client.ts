@@ -102,6 +102,13 @@ const RESOURCES: ResourceConfig[] = [
         description: "Stop timer and save sessions",
         response: "StopTimerResponse",
       },
+      {
+        name: "cancel",
+        method: "delete",
+        path: "/timer",
+        description: "Cancel timer without saving sessions",
+        response: "TimerState",
+      },
     ],
   },
   {
@@ -604,63 +611,113 @@ export type LocuClient = ReturnType<typeof createLocuClient>
 }
 
 // ============================================================================
-// VALIDATION - Check that all API paths are covered
+// VALIDATION - Check that all API paths AND methods are covered
 // ============================================================================
 
-async function extractPathsFromGeneratedApi(): Promise<Set<string>> {
+type HttpMethodLower = "get" | "post" | "put" | "patch" | "delete"
+
+async function extractPathMethodsFromGeneratedApi(): Promise<
+  Map<string, Set<HttpMethodLower>>
+> {
   const apiPath = join(__dirname, "..", "src", "generated", "api.ts")
   const content = await readFile(apiPath, "utf-8")
 
-  const paths = new Set<string>()
-  const pathRegex = /^\s{4}"(\/[^"]+)":\s*\{/gm
-  let match
+  const pathMethods = new Map<string, Set<HttpMethodLower>>()
+  const httpMethods: HttpMethodLower[] = [
+    "get",
+    "post",
+    "put",
+    "patch",
+    "delete",
+  ]
 
-  while ((match = pathRegex.exec(content)) !== null) {
-    paths.add(match[1])
+  // Find each path block
+  const pathRegex = /^\s{4}"(\/[^"]+)":\s*\{/gm
+  let pathMatch
+
+  while ((pathMatch = pathRegex.exec(content)) !== null) {
+    const path = pathMatch[1]
+    const pathStart = pathMatch.index
+    const methods = new Set<HttpMethodLower>()
+
+    // Find the end of this path block (next path or end of paths object)
+    const nextPathMatch = /^\s{4}"\/[^"]+\":\s*\{/gm
+    nextPathMatch.lastIndex = pathStart + 1
+    const nextMatch = nextPathMatch.exec(content)
+    const pathEnd = nextMatch
+      ? nextMatch.index
+      : content.indexOf("\n    };", pathStart)
+    const pathBlock = content.slice(pathStart, pathEnd)
+
+    // Check each HTTP method - look for actual implementation (not `method?: never`)
+    for (const method of httpMethods) {
+      // Match "get: {" but not "get?: never" or "get?: never;"
+      const methodImplRegex = new RegExp(`^\\s{8}${method}:\\s*\\{`, "m")
+      if (methodImplRegex.test(pathBlock)) {
+        methods.add(method)
+      }
+    }
+
+    if (methods.size > 0) {
+      pathMethods.set(path, methods)
+    }
   }
 
-  return paths
+  return pathMethods
 }
 
-function getConfiguredPaths(): Set<string> {
-  const paths = new Set<string>()
+function getConfiguredPathMethods(): Map<string, Set<HttpMethodLower>> {
+  const pathMethods = new Map<string, Set<HttpMethodLower>>()
+
+  const addMethod = (path: string, method: HttpMethodLower) => {
+    if (!pathMethods.has(path)) {
+      pathMethods.set(path, new Set())
+    }
+    pathMethods.get(path)!.add(method)
+  }
 
   for (const resource of RESOURCES) {
-    paths.add(resource.basePath)
-
-    // Singletons can have custom methods but no {id} routes
+    // Singletons: only GET on basePath plus custom methods
     if (resource.singleton) {
+      addMethod(resource.basePath, "get")
       for (const method of resource.customMethods || []) {
-        paths.add(method.path)
+        addMethod(method.path, method.method)
       }
     } else {
-      paths.add(`${resource.basePath}/{id}`)
+      // Regular resources: full CRUD
+      addMethod(resource.basePath, "get") // list
+      addMethod(resource.basePath, "post") // create (if createRequest exists)
+      addMethod(`${resource.basePath}/{id}`, "get") // get by id
+      addMethod(`${resource.basePath}/{id}`, "patch") // update
+      addMethod(`${resource.basePath}/{id}`, "delete") // delete
 
       for (const method of resource.customMethods || []) {
-        paths.add(method.path)
+        addMethod(method.path, method.method)
       }
 
       for (const nested of resource.nested || []) {
-        paths.add(`${resource.basePath}/{id}${nested.basePath}`)
+        const nestedBase = `${resource.basePath}/{id}${nested.basePath}`
+        addMethod(nestedBase, "get") // list
+        if (nested.createRequest) addMethod(nestedBase, "post") // create
         if (nested.idParam) {
-          paths.add(
-            `${resource.basePath}/{id}${nested.basePath}/{${nested.idParam}}`
-          )
+          const nestedItem = `${nestedBase}/{${nested.idParam}}`
+          if (nested.updateRequest) addMethod(nestedItem, "patch") // update
+          addMethod(nestedItem, "delete") // delete
         }
       }
     }
   }
 
-  return paths
+  return pathMethods
 }
 
 async function validatePaths(): Promise<boolean> {
-  const apiPaths = await extractPathsFromGeneratedApi()
-  const configuredPaths = getConfiguredPaths()
+  const apiPathMethods = await extractPathMethodsFromGeneratedApi()
+  const configuredPathMethods = getConfiguredPathMethods()
 
-  const missingPaths: string[] = []
+  const missing: string[] = []
 
-  for (const path of apiPaths) {
+  for (const [path, methods] of apiPathMethods) {
     // Normalize path params for comparison
     const normalizedPath = path.replace(/\{[^}]+\}/g, (match) => {
       if (match === "{id}") return "{id}"
@@ -668,17 +725,21 @@ async function validatePaths(): Promise<boolean> {
       return match
     })
 
-    if (!configuredPaths.has(normalizedPath)) {
-      missingPaths.push(path)
+    const configuredMethods = configuredPathMethods.get(normalizedPath)
+
+    for (const method of methods) {
+      if (!configuredMethods?.has(method)) {
+        missing.push(`${method.toUpperCase()} ${path}`)
+      }
     }
   }
 
-  if (missingPaths.length > 0) {
+  if (missing.length > 0) {
     console.error(
-      "\n❌ ERROR: The following API paths are NOT covered by the client:"
+      "\n❌ ERROR: The following API endpoints are NOT covered by the client:"
     )
-    for (const path of missingPaths.sort()) {
-      console.error(`   - ${path}`)
+    for (const endpoint of missing.sort()) {
+      console.error(`   - ${endpoint}`)
     }
     console.error("\n   Add them to RESOURCES in scripts/generate-client.ts")
     console.error("   Then run: npm run generate:client\n")

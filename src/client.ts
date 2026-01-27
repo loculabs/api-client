@@ -136,6 +136,9 @@ export const createLocuClient = (config: LocuClientConfig) => {
 
       /** Stop timer and save sessions */
       stop: (): Promise<StopTimerResponse> => request("POST", "/timer/stop"),
+
+      /** Cancel timer without saving sessions */
+      cancel: (): Promise<TimerState> => request("DELETE", "/timer"),
     },
 
     // ============ Tasks ============

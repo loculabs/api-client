@@ -2310,7 +2310,75 @@ export interface paths {
         };
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Cancel timer
+         * @description Cancel the timer without saving any sessions. All tracked time will be discarded.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successful response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TimerState"];
+                    };
+                };
+                /** @description Bad request - validation error */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized - invalid or missing API key */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Rate limit exceeded */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -3235,74 +3303,11 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @description Task description in multiple formats */
-        TaskDescription: {
-            /** @description Description content as Markdown */
-            markdown: string;
-            /** @description Description content as HTML (only included when includeHtml=true) */
-            html?: string;
-            /**
-             * @description ProseMirror JSON document. Root node always has type "doc" with a content array of child nodes.
-             * @example {
-             *       "type": "doc",
-             *       "content": [
-             *         {
-             *           "type": "paragraph",
-             *           "content": [
-             *             {
-             *               "type": "text",
-             *               "text": "Hello "
-             *             },
-             *             {
-             *               "type": "text",
-             *               "text": "world",
-             *               "marks": [
-             *                 {
-             *                   "type": "bold"
-             *                 }
-             *               ]
-             *             }
-             *           ]
-             *         }
-             *       ]
-             *     }
-             */
-            json?: {
-                /**
-                 * @description Document root type, always "doc"
-                 * @enum {string}
-                 */
-                type: "doc";
-                /** @description Array of child document nodes */
-                content: {
-                    /** @description Node type (e.g., "paragraph", "text", "heading", "bulletList") */
-                    type: string;
-                    /** @description Node attributes */
-                    attrs?: {
-                        [key: string]: (string | null) | number | boolean;
-                    };
-                    /** @description Child nodes (recursive DocumentNode array) */
-                    content?: Record<string, never>[];
-                    /** @description Text content (only for text nodes) */
-                    text?: string;
-                    /** @description Text marks (bold, italic, links, etc.) - only for text nodes */
-                    marks?: {
-                        /** @description Mark type (e.g., "bold", "italic", "link") */
-                        type: string;
-                        /** @description Mark attributes */
-                        attrs?: {
-                            [key: string]: (string | null) | number | boolean;
-                        };
-                    }[];
-                }[];
-            };
-            /** @description Description content as plain text */
-            plainText: string;
-        } | null;
+        Task: components["schemas"]["LocuTask"] | components["schemas"]["LinearTask"] | components["schemas"]["JiraTask"];
         LocuTask: {
             id: string;
             name: string;
-            done: "completed" | "canceled" | unknown;
+            done: "completed" | "canceled" | null;
             doneAt: number | null;
             createdAt: number;
             parent: {
@@ -3315,19 +3320,82 @@ export interface components {
             } | null;
             projectId?: string | null;
             cursorAgentUrl?: string | null;
-            integrationId: unknown;
+            integrationId: null;
             slackLink?: string;
             /**
              * @default locu
              * @enum {string}
              */
             type: "locu";
-            description?: components["schemas"]["TaskDescription"];
+            /** @description Task description in multiple formats */
+            description?: {
+                /** @description Description content as Markdown */
+                markdown: string;
+                /** @description Description content as HTML (only included when includeHtml=true) */
+                html?: string;
+                /**
+                 * @description Description content as ProseMirror JSON document
+                 * @example {
+                 *       "type": "doc",
+                 *       "content": [
+                 *         {
+                 *           "type": "paragraph",
+                 *           "content": [
+                 *             {
+                 *               "type": "text",
+                 *               "text": "Hello "
+                 *             },
+                 *             {
+                 *               "type": "text",
+                 *               "text": "world",
+                 *               "marks": [
+                 *                 {
+                 *                   "type": "bold"
+                 *                 }
+                 *               ]
+                 *             }
+                 *           ]
+                 *         }
+                 *       ]
+                 *     }
+                 */
+                json?: {
+                    /**
+                     * @description Document root type, always "doc"
+                     * @enum {string}
+                     */
+                    type: "doc";
+                    /** @description Array of child document nodes */
+                    content: {
+                        /** @description Node type (e.g., "paragraph", "text", "heading", "bulletList") */
+                        type: string;
+                        /** @description Node attributes */
+                        attrs?: {
+                            [key: string]: (string | null) | number | boolean;
+                        };
+                        /** @description Child nodes (recursive DocumentNode array) */
+                        content?: Record<string, never>[];
+                        /** @description Text content (only for text nodes) */
+                        text?: string;
+                        /** @description Text marks (bold, italic, links, etc.) - only for text nodes */
+                        marks?: {
+                            /** @description Mark type (e.g., "bold", "italic", "link") */
+                            type: string;
+                            /** @description Mark attributes */
+                            attrs?: {
+                                [key: string]: (string | null) | number | boolean;
+                            };
+                        }[];
+                    }[];
+                };
+                /** @description Description content as plain text */
+                plainText: string;
+            } | null;
         };
         LinearTask: {
             id: string;
             name: string;
-            done: "completed" | "canceled" | unknown;
+            done: "completed" | "canceled" | null;
             doneAt: number | null;
             createdAt: number;
             parent: {
@@ -3345,7 +3413,70 @@ export interface components {
             priority?: number;
             organizationId: string;
             teamId: string;
-            description?: components["schemas"]["TaskDescription"];
+            /** @description Task description in multiple formats */
+            description?: {
+                /** @description Description content as Markdown */
+                markdown: string;
+                /** @description Description content as HTML (only included when includeHtml=true) */
+                html?: string;
+                /**
+                 * @description Description content as ProseMirror JSON document
+                 * @example {
+                 *       "type": "doc",
+                 *       "content": [
+                 *         {
+                 *           "type": "paragraph",
+                 *           "content": [
+                 *             {
+                 *               "type": "text",
+                 *               "text": "Hello "
+                 *             },
+                 *             {
+                 *               "type": "text",
+                 *               "text": "world",
+                 *               "marks": [
+                 *                 {
+                 *                   "type": "bold"
+                 *                 }
+                 *               ]
+                 *             }
+                 *           ]
+                 *         }
+                 *       ]
+                 *     }
+                 */
+                json?: {
+                    /**
+                     * @description Document root type, always "doc"
+                     * @enum {string}
+                     */
+                    type: "doc";
+                    /** @description Array of child document nodes */
+                    content: {
+                        /** @description Node type (e.g., "paragraph", "text", "heading", "bulletList") */
+                        type: string;
+                        /** @description Node attributes */
+                        attrs?: {
+                            [key: string]: (string | null) | number | boolean;
+                        };
+                        /** @description Child nodes (recursive DocumentNode array) */
+                        content?: Record<string, never>[];
+                        /** @description Text content (only for text nodes) */
+                        text?: string;
+                        /** @description Text marks (bold, italic, links, etc.) - only for text nodes */
+                        marks?: {
+                            /** @description Mark type (e.g., "bold", "italic", "link") */
+                            type: string;
+                            /** @description Mark attributes */
+                            attrs?: {
+                                [key: string]: (string | null) | number | boolean;
+                            };
+                        }[];
+                    }[];
+                };
+                /** @description Description content as plain text */
+                plainText: string;
+            } | null;
             assignee: {
                 id: string;
                 name: string;
@@ -3366,7 +3497,7 @@ export interface components {
         JiraTask: {
             id: string;
             name: string;
-            done: "completed" | "canceled" | unknown;
+            done: "completed" | "canceled" | null;
             doneAt: number | null;
             createdAt: number;
             parent: {
@@ -3380,7 +3511,70 @@ export interface components {
             projectId: string;
             cursorAgentUrl?: string | null;
             integrationId: string;
-            description?: components["schemas"]["TaskDescription"];
+            /** @description Task description in multiple formats */
+            description?: {
+                /** @description Description content as Markdown */
+                markdown: string;
+                /** @description Description content as HTML (only included when includeHtml=true) */
+                html?: string;
+                /**
+                 * @description Description content as ProseMirror JSON document
+                 * @example {
+                 *       "type": "doc",
+                 *       "content": [
+                 *         {
+                 *           "type": "paragraph",
+                 *           "content": [
+                 *             {
+                 *               "type": "text",
+                 *               "text": "Hello "
+                 *             },
+                 *             {
+                 *               "type": "text",
+                 *               "text": "world",
+                 *               "marks": [
+                 *                 {
+                 *                   "type": "bold"
+                 *                 }
+                 *               ]
+                 *             }
+                 *           ]
+                 *         }
+                 *       ]
+                 *     }
+                 */
+                json?: {
+                    /**
+                     * @description Document root type, always "doc"
+                     * @enum {string}
+                     */
+                    type: "doc";
+                    /** @description Array of child document nodes */
+                    content: {
+                        /** @description Node type (e.g., "paragraph", "text", "heading", "bulletList") */
+                        type: string;
+                        /** @description Node attributes */
+                        attrs?: {
+                            [key: string]: (string | null) | number | boolean;
+                        };
+                        /** @description Child nodes (recursive DocumentNode array) */
+                        content?: Record<string, never>[];
+                        /** @description Text content (only for text nodes) */
+                        text?: string;
+                        /** @description Text marks (bold, italic, links, etc.) - only for text nodes */
+                        marks?: {
+                            /** @description Mark type (e.g., "bold", "italic", "link") */
+                            type: string;
+                            /** @description Mark attributes */
+                            attrs?: {
+                                [key: string]: (string | null) | number | boolean;
+                            };
+                        }[];
+                    }[];
+                };
+                /** @description Description content as plain text */
+                plainText: string;
+            } | null;
             assignee: {
                 id: string;
                 avatar?: string;
@@ -3410,7 +3604,6 @@ export interface components {
              */
             type: "jira";
         };
-        Task: components["schemas"]["LocuTask"] | components["schemas"]["LinearTask"] | components["schemas"]["JiraTask"];
         MeResponse: {
             /** @description Email of the authenticated user */
             email: string;
@@ -3421,6 +3614,11 @@ export interface components {
             error: string;
             message: string;
             code?: string;
+        };
+        NoteListResponse: {
+            data: components["schemas"]["Note"][];
+            nextCursor: string | null;
+            hasMore: boolean;
         };
         Note: {
             id: string;
@@ -3442,7 +3640,7 @@ export interface components {
             /** @description Note content as HTML (only included when includeHtml=true) */
             html?: string;
             /**
-             * @description ProseMirror JSON document. Root node always has type "doc" with a content array of child nodes.
+             * @description Note content as ProseMirror JSON document
              * @example {
              *       "type": "doc",
              *       "content": [
@@ -3499,11 +3697,6 @@ export interface components {
             /** @description Note content as plain text */
             plainText: string;
         };
-        NoteListResponse: {
-            data: components["schemas"]["Note"][];
-            nextCursor: string | null;
-            hasMore: boolean;
-        };
         CreateNoteRequest: {
             /**
              * Format: uuid
@@ -3532,70 +3725,11 @@ export interface components {
         DeleteNoteResponse: {
             success: boolean;
         };
-        /** @description Project description in multiple formats */
-        ProjectDescription: {
-            /** @description Description content as Markdown */
-            markdown: string;
-            /** @description Description content as HTML (only included when includeHtml=true) */
-            html?: string;
-            /**
-             * @description ProseMirror JSON document. Root node always has type "doc" with a content array of child nodes.
-             * @example {
-             *       "type": "doc",
-             *       "content": [
-             *         {
-             *           "type": "paragraph",
-             *           "content": [
-             *             {
-             *               "type": "text",
-             *               "text": "Hello "
-             *             },
-             *             {
-             *               "type": "text",
-             *               "text": "world",
-             *               "marks": [
-             *                 {
-             *                   "type": "bold"
-             *                 }
-             *               ]
-             *             }
-             *           ]
-             *         }
-             *       ]
-             *     }
-             */
-            json?: {
-                /**
-                 * @description Document root type, always "doc"
-                 * @enum {string}
-                 */
-                type: "doc";
-                /** @description Array of child document nodes */
-                content: {
-                    /** @description Node type (e.g., "paragraph", "text", "heading", "bulletList") */
-                    type: string;
-                    /** @description Node attributes */
-                    attrs?: {
-                        [key: string]: (string | null) | number | boolean;
-                    };
-                    /** @description Child nodes (recursive DocumentNode array) */
-                    content?: Record<string, never>[];
-                    /** @description Text content (only for text nodes) */
-                    text?: string;
-                    /** @description Text marks (bold, italic, links, etc.) - only for text nodes */
-                    marks?: {
-                        /** @description Mark type (e.g., "bold", "italic", "link") */
-                        type: string;
-                        /** @description Mark attributes */
-                        attrs?: {
-                            [key: string]: (string | null) | number | boolean;
-                        };
-                    }[];
-                }[];
-            };
-            /** @description Description content as plain text */
-            plainText: string;
-        } | null;
+        ProjectListResponse: {
+            data: components["schemas"]["Project"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
         Project: {
             id: string;
             name: string;
@@ -3605,12 +3739,70 @@ export interface components {
             completedAt?: number | null;
             createdAt: number;
             updatedAt: number;
-            description?: components["schemas"]["ProjectDescription"];
-        };
-        ProjectListResponse: {
-            data: components["schemas"]["Project"][];
-            nextCursor: string | null;
-            hasMore: boolean;
+            /** @description Project description in multiple formats */
+            description?: {
+                /** @description Description content as Markdown */
+                markdown: string;
+                /** @description Description content as HTML (only included when includeHtml=true) */
+                html?: string;
+                /**
+                 * @description Description content as ProseMirror JSON document
+                 * @example {
+                 *       "type": "doc",
+                 *       "content": [
+                 *         {
+                 *           "type": "paragraph",
+                 *           "content": [
+                 *             {
+                 *               "type": "text",
+                 *               "text": "Hello "
+                 *             },
+                 *             {
+                 *               "type": "text",
+                 *               "text": "world",
+                 *               "marks": [
+                 *                 {
+                 *                   "type": "bold"
+                 *                 }
+                 *               ]
+                 *             }
+                 *           ]
+                 *         }
+                 *       ]
+                 *     }
+                 */
+                json?: {
+                    /**
+                     * @description Document root type, always "doc"
+                     * @enum {string}
+                     */
+                    type: "doc";
+                    /** @description Array of child document nodes */
+                    content: {
+                        /** @description Node type (e.g., "paragraph", "text", "heading", "bulletList") */
+                        type: string;
+                        /** @description Node attributes */
+                        attrs?: {
+                            [key: string]: (string | null) | number | boolean;
+                        };
+                        /** @description Child nodes (recursive DocumentNode array) */
+                        content?: Record<string, never>[];
+                        /** @description Text content (only for text nodes) */
+                        text?: string;
+                        /** @description Text marks (bold, italic, links, etc.) - only for text nodes */
+                        marks?: {
+                            /** @description Mark type (e.g., "bold", "italic", "link") */
+                            type: string;
+                            /** @description Mark attributes */
+                            attrs?: {
+                                [key: string]: (string | null) | number | boolean;
+                            };
+                        }[];
+                    }[];
+                };
+                /** @description Description content as plain text */
+                plainText: string;
+            } | null;
         };
         CreateProjectRequest: {
             /**
@@ -3644,6 +3836,15 @@ export interface components {
         };
         DeleteProjectResponse: {
             success: boolean;
+        };
+        SessionListResponse: {
+            data: components["schemas"]["SessionWithActivities"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
+        SessionWithActivities: components["schemas"]["Session"] & {
+            /** @description Activities within this session */
+            activities: components["schemas"]["SessionActivity"][];
         };
         SessionActivity: {
             /** @enum {string} */
@@ -3696,15 +3897,6 @@ export interface components {
             /** @description End timestamp (Unix seconds) */
             finishedAt: number;
         };
-        SessionWithActivities: components["schemas"]["Session"] & {
-            /** @description Activities within this session */
-            activities: components["schemas"]["SessionActivity"][];
-        };
-        SessionListResponse: {
-            data: components["schemas"]["SessionWithActivities"][];
-            nextCursor: string | null;
-            hasMore: boolean;
-        };
         CreateSessionRequest: {
             /**
              * Format: uuid
@@ -3754,6 +3946,11 @@ export interface components {
             nextCursor: string | null;
             hasMore: boolean;
         };
+        TaskSectionsResponse: {
+            today: components["schemas"]["TaskBySection"][];
+            sooner: components["schemas"]["TaskBySection"][];
+            later: components["schemas"]["TaskBySection"][];
+        };
         TaskBySection: {
             /** Format: uuid */
             taskId: string;
@@ -3761,11 +3958,6 @@ export interface components {
             section: "today" | "sooner" | "later";
             order: number;
             task: components["schemas"]["Task"];
-        };
-        TaskSectionsResponse: {
-            today: components["schemas"]["TaskBySection"][];
-            sooner: components["schemas"]["TaskBySection"][];
-            later: components["schemas"]["TaskBySection"][];
         };
         TaskSubtasksResponse: {
             data: components["schemas"]["Task"][];
@@ -3804,7 +3996,7 @@ export interface components {
             /** @description Task description in markdown format */
             description?: string;
             /** @description Task completion status */
-            done?: "completed" | "canceled" | unknown | unknown;
+            done?: "completed" | "canceled" | null;
             /**
              * Format: uuid
              * @description Project to assign the task to
@@ -3837,6 +4029,10 @@ export interface components {
             /** @description Optional task ID to start working on */
             taskId?: string;
         };
+        StopTimerResponse: {
+            /** @description The completed sessions that were created */
+            sessions: components["schemas"]["StopTimerSession"][];
+        };
         StopTimerSession: {
             /** @description Unique identifier for the session */
             id: string;
@@ -3847,9 +4043,10 @@ export interface components {
             /** @description End timestamp (Unix seconds) */
             finishedAt: number;
         };
-        StopTimerResponse: {
-            /** @description The completed sessions that were created */
-            sessions: components["schemas"]["StopTimerSession"][];
+        WebhookListResponse: {
+            data: components["schemas"]["Webhook"][];
+            nextCursor: string | null;
+            hasMore: boolean;
         };
         Webhook: {
             /**
@@ -3878,11 +4075,6 @@ export interface components {
              * @description Last update timestamp
              */
             updatedAt: string;
-        };
-        WebhookListResponse: {
-            data: components["schemas"]["Webhook"][];
-            nextCursor: string | null;
-            hasMore: boolean;
         };
         WebhookWithSecret: components["schemas"]["Webhook"] & {
             /** @description Secret for verifying webhook signatures (only shown once) */
@@ -3930,6 +4122,11 @@ export interface components {
         DeleteWebhookResponse: {
             success: boolean;
         };
+        WebhookDeliveryListResponse: {
+            data: components["schemas"]["WebhookDelivery"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
         WebhookDelivery: {
             /**
              * Format: uuid
@@ -3962,11 +4159,6 @@ export interface components {
              * @description Delivery completion timestamp
              */
             completedAt: string | null;
-        };
-        WebhookDeliveryListResponse: {
-            data: components["schemas"]["WebhookDelivery"][];
-            nextCursor: string | null;
-            hasMore: boolean;
         };
         RotateSecretResponse: {
             /** @description New webhook secret */
