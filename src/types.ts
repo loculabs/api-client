@@ -102,9 +102,12 @@ export type PaginationParams = {
   cursor?: string
 }
 
+/** Accepts boolean or string representation for query params */
+export type BooleanParam = boolean | "true" | "false"
+
 // List params for each entity type
 export type TaskListParams = PaginationParams & {
-  done?: "true" | "false"
+  done?: BooleanParam
   projectId?: string
   parentId?: string
   section?: "today" | "sooner" | "later"
@@ -119,7 +122,7 @@ export type TaskSectionsParams = {
 }
 
 export type SubtaskListParams = PaginationParams & {
-  done?: "true" | "false"
+  done?: BooleanParam
   includeHtml?: boolean | null
 }
 
@@ -140,5 +143,5 @@ export type SessionListParams = PaginationParams & {
 }
 
 export type WebhookListParams = PaginationParams & {
-  isActive?: "true" | "false"
+  isActive?: BooleanParam
 }
