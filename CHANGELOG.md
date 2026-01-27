@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/loculabs/api-client/compare/v1.1.0...v1.2.0) (2026-01-27)
+
+
+### Features
+
+* **types:** accept boolean values for string boolean params ([3a62057](https://github.com/loculabs/api-client/commit/3a62057077c46176bf81799474151ccaa7fa708b))
+
 # [1.1.0](https://github.com/loculabs/api-client/compare/v1.0.0...v1.1.0) (2026-01-21)
 
 
