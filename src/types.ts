@@ -1,20 +1,37 @@
 import type { components, paths } from "./generated/api"
 
+/** Helper to make keepBreaks optional (has server default) */
+type WithOptionalKeepBreaks<T> = Omit<T, "keepBreaks"> & {
+  keepBreaks?: boolean
+}
+
 // Tasks
 export type Task = components["schemas"]["Task"]
-export type CreateTaskRequest = components["schemas"]["CreateTaskRequest"]
-export type UpdateTaskRequest = components["schemas"]["UpdateTaskRequest"]
+export type CreateTaskRequest = WithOptionalKeepBreaks<
+  components["schemas"]["CreateTaskRequest"]
+>
+export type UpdateTaskRequest = WithOptionalKeepBreaks<
+  components["schemas"]["UpdateTaskRequest"]
+>
 export type TaskSectionsResponse = components["schemas"]["TaskSectionsResponse"]
 
 // Projects
 export type Project = components["schemas"]["Project"]
-export type CreateProjectRequest = components["schemas"]["CreateProjectRequest"]
-export type UpdateProjectRequest = components["schemas"]["UpdateProjectRequest"]
+export type CreateProjectRequest = WithOptionalKeepBreaks<
+  components["schemas"]["CreateProjectRequest"]
+>
+export type UpdateProjectRequest = WithOptionalKeepBreaks<
+  components["schemas"]["UpdateProjectRequest"]
+>
 
 // Notes
 export type Note = components["schemas"]["Note"]
-export type CreateNoteRequest = components["schemas"]["CreateNoteRequest"]
-export type UpdateNoteRequest = components["schemas"]["UpdateNoteRequest"]
+export type CreateNoteRequest = WithOptionalKeepBreaks<
+  components["schemas"]["CreateNoteRequest"]
+>
+export type UpdateNoteRequest = WithOptionalKeepBreaks<
+  components["schemas"]["UpdateNoteRequest"]
+>
 
 // Sessions & Activities
 export type Session = components["schemas"]["Session"]

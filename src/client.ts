@@ -117,35 +117,29 @@ export const createLocuClient = (config: LocuClientConfig) => {
     // ============ Me ============
     me: {
       /** Get current me */
-      get: (): Promise<MeResponse> =>
-        request("GET", "/me"),
+      get: (): Promise<MeResponse> => request("GET", "/me"),
     },
 
     // ============ Timer ============
     timer: {
       /** Get current timer */
-      get: (): Promise<TimerState> =>
-        request("GET", "/timer"),
+      get: (): Promise<TimerState> => request("GET", "/timer"),
 
       /** Start a new timer */
       start: (data?: StartTimerRequest): Promise<TimerState> =>
         request("POST", "/timer/start", data),
 
       /** Pause the running timer */
-      pause: (): Promise<TimerState> =>
-        request("POST", "/timer/pause"),
+      pause: (): Promise<TimerState> => request("POST", "/timer/pause"),
 
       /** Resume a paused timer */
-      continue: (): Promise<TimerState> =>
-        request("POST", "/timer/continue"),
+      continue: (): Promise<TimerState> => request("POST", "/timer/continue"),
 
       /** Stop timer and save sessions */
-      stop: (): Promise<StopTimerResponse> =>
-        request("POST", "/timer/stop"),
+      stop: (): Promise<StopTimerResponse> => request("POST", "/timer/stop"),
 
       /** Cancel timer without saving sessions */
-      cancel: (): Promise<TimerState> =>
-        request("DELETE", "/timer"),
+      cancel: (): Promise<TimerState> => request("DELETE", "/timer"),
     },
 
     // ============ Tasks ============
@@ -155,8 +149,7 @@ export const createLocuClient = (config: LocuClientConfig) => {
         request("GET", `/tasks${buildQueryString(params)}`),
 
       /** Get a single task by ID */
-      get: (id: string): Promise<Task> =>
-        request("GET", `/tasks/${id}`),
+      get: (id: string): Promise<Task> => request("GET", `/tasks/${id}`),
 
       /** Create a new task */
       create: (data: CreateTaskRequest): Promise<Task> =>
@@ -171,33 +164,35 @@ export const createLocuClient = (config: LocuClientConfig) => {
         request("DELETE", `/tasks/${id}`),
 
       /** Get tasks organized by section (today, sooner, later) */
-      sections: (params: TaskSectionsParams = {}): Promise<TaskSectionsResponse> =>
+      sections: (
+        params: TaskSectionsParams = {}
+      ): Promise<TaskSectionsResponse> =>
         request("GET", `/tasks/sections${buildQueryString(params)}`),
 
       /** List subtasks for a task */
       subtasks: (
         id: string,
-        params: SubtaskListParams = {},
+        params: SubtaskListParams = {}
       ): Promise<PaginatedResponse<Task>> =>
         request("GET", `/tasks/${id}/subtasks${buildQueryString(params)}`),
 
       /** Create a subtask under a parent task */
       createSubtask: (
         parentId: string,
-        data: Omit<CreateTaskRequest, "parentId" | "section">,
-      ): Promise<Task> =>
-        request("POST", "/tasks", { ...data, parentId }),
+        data: Omit<CreateTaskRequest, "parentId" | "section">
+      ): Promise<Task> => request("POST", "/tasks", { ...data, parentId }),
     },
 
     // ============ Projects ============
     projects: {
       /** List all projects */
-      list: (params: ProjectListParams = {}): Promise<PaginatedResponse<Project>> =>
+      list: (
+        params: ProjectListParams = {}
+      ): Promise<PaginatedResponse<Project>> =>
         request("GET", `/projects${buildQueryString(params)}`),
 
       /** Get a single project by ID */
-      get: (id: string): Promise<Project> =>
-        request("GET", `/projects/${id}`),
+      get: (id: string): Promise<Project> => request("GET", `/projects/${id}`),
 
       /** Create a new project */
       create: (data: CreateProjectRequest): Promise<Project> =>
@@ -210,7 +205,6 @@ export const createLocuClient = (config: LocuClientConfig) => {
       /** Delete a project */
       delete: (id: string): Promise<{ success: boolean }> =>
         request("DELETE", `/projects/${id}`),
-
     },
 
     // ============ Notes ============
@@ -220,8 +214,7 @@ export const createLocuClient = (config: LocuClientConfig) => {
         request("GET", `/notes${buildQueryString(params)}`),
 
       /** Get a single note by ID */
-      get: (id: string): Promise<Note> =>
-        request("GET", `/notes/${id}`),
+      get: (id: string): Promise<Note> => request("GET", `/notes/${id}`),
 
       /** Create a new note */
       create: (data: CreateNoteRequest): Promise<Note> =>
@@ -234,13 +227,14 @@ export const createLocuClient = (config: LocuClientConfig) => {
       /** Delete a note */
       delete: (id: string): Promise<{ success: boolean }> =>
         request("DELETE", `/notes/${id}`),
-
     },
 
     // ============ Sessions ============
     sessions: {
       /** List all sessions */
-      list: (params: SessionListParams = {}): Promise<PaginatedResponse<SessionWithActivities>> =>
+      list: (
+        params: SessionListParams = {}
+      ): Promise<PaginatedResponse<SessionWithActivities>> =>
         request("GET", `/sessions${buildQueryString(params)}`),
 
       /** Get a single session by ID */
@@ -260,7 +254,9 @@ export const createLocuClient = (config: LocuClientConfig) => {
         request("DELETE", `/sessions/${id}`),
 
       /** List all activities with optional filters */
-      listActivities: (params: ActivityListParams = {}): Promise<PaginatedResponse<SessionActivity>> =>
+      listActivities: (
+        params: ActivityListParams = {}
+      ): Promise<PaginatedResponse<SessionActivity>> =>
         request("GET", `/sessions/activities${buildQueryString(params)}`),
 
       // Activities
@@ -272,7 +268,7 @@ export const createLocuClient = (config: LocuClientConfig) => {
         /** Create a new activitie */
         create: (
           sessionId: string,
-          data: CreateActivityRequest,
+          data: CreateActivityRequest
         ): Promise<SessionActivity> =>
           request("POST", `/sessions/${sessionId}/activities`, data),
 
@@ -280,18 +276,18 @@ export const createLocuClient = (config: LocuClientConfig) => {
         update: (
           sessionId: string,
           activityId: string,
-          data: UpdateActivityRequest,
+          data: UpdateActivityRequest
         ): Promise<SessionActivity> =>
           request(
             "PATCH",
             `/sessions/${sessionId}/activities/${activityId}`,
-            data,
+            data
           ),
 
         /** Delete an activitie */
         delete: (
           sessionId: string,
-          activityId: string,
+          activityId: string
         ): Promise<{ success: boolean }> =>
           request("DELETE", `/sessions/${sessionId}/activities/${activityId}`),
       },
@@ -300,12 +296,13 @@ export const createLocuClient = (config: LocuClientConfig) => {
     // ============ Webhooks ============
     webhooks: {
       /** List all webhooks */
-      list: (params: WebhookListParams = {}): Promise<PaginatedResponse<Webhook>> =>
+      list: (
+        params: WebhookListParams = {}
+      ): Promise<PaginatedResponse<Webhook>> =>
         request("GET", `/webhooks${buildQueryString(params)}`),
 
       /** Get a single webhook by ID */
-      get: (id: string): Promise<Webhook> =>
-        request("GET", `/webhooks/${id}`),
+      get: (id: string): Promise<Webhook> => request("GET", `/webhooks/${id}`),
 
       /** Create a new webhook */
       create: (data: CreateWebhookRequest): Promise<WebhookWithSecret> =>
@@ -326,7 +323,7 @@ export const createLocuClient = (config: LocuClientConfig) => {
       /** List deliveries for a webhook */
       deliveries: (
         id: string,
-        params: PaginationParams = {},
+        params: PaginationParams = {}
       ): Promise<PaginatedResponse<WebhookDelivery>> =>
         request("GET", `/webhooks/${id}/deliveries${buildQueryString(params)}`),
     },
