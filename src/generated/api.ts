@@ -513,6 +513,10 @@ export interface paths {
                     limit?: number;
                     /** @description Cursor for pagination */
                     cursor?: string;
+                    /** @description Field to order results by */
+                    orderBy?: "updatedAt" | "createdAt";
+                    /** @description Sort order (ascending or descending) */
+                    order?: "asc" | "desc";
                     /** @description Filter by project state */
                     state?: "planned" | "completed";
                     /** @description Include HTML representation of the project description */
@@ -920,6 +924,10 @@ export interface paths {
                     limit?: number;
                     /** @description Cursor for pagination */
                     cursor?: string;
+                    /** @description Field to order results by */
+                    orderBy?: "updatedAt" | "createdAt" | "finishedAt";
+                    /** @description Sort order (ascending or descending) */
+                    order?: "asc" | "desc";
                     /** @description Filter sessions starting after this date (Unix seconds or ISO 8601) */
                     startAfter?: string;
                     /** @description Filter sessions starting before this date (Unix seconds or ISO 8601) */
@@ -1063,6 +1071,103 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/activities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List activities
+         * @description Retrieve a paginated list of session activities. Supports filtering by task ID or session ID.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Number of activities to return */
+                    limit?: number;
+                    /** @description Cursor for pagination */
+                    cursor?: string;
+                    /** @description Field to order results by */
+                    orderBy?: "updatedAt" | "createdAt";
+                    /** @description Sort order (ascending or descending) */
+                    order?: "asc" | "desc";
+                    /** @description Filter activities by task ID */
+                    taskId?: string;
+                    /** @description Filter activities by session ID */
+                    sessionId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successful response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ActivityPaginatedListResponse"];
+                    };
+                };
+                /** @description Bad request - validation error */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized - invalid or missing API key */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Resource not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Rate limit exceeded */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1648,6 +1753,10 @@ export interface paths {
                     cursor?: string;
                     /** @description Number of items to return (max 100) */
                     limit?: string;
+                    /** @description Field to order results by. Note: doneAt ordering only applies to completed tasks */
+                    orderBy?: "updatedAt" | "doneAt";
+                    /** @description Sort order (ascending or descending) */
+                    order?: "asc" | "desc";
                     /** @description Filter by completion status */
                     done?: "true" | "false";
                     /** @description Filter by project */
@@ -3711,6 +3820,11 @@ export interface components {
             color?: string | null;
             /** @description Parent folder ID */
             folderId?: string;
+            /**
+             * @description Preserve extra blank lines as empty paragraphs instead of collapsing them
+             * @default true
+             */
+            keepBreaks: boolean;
         };
         UpdateNoteRequest: {
             /** @description New text content for the note */
@@ -3721,6 +3835,11 @@ export interface components {
             color?: string | null;
             /** @description New parent folder ID */
             folderId?: string | null;
+            /**
+             * @description Preserve extra blank lines as empty paragraphs instead of collapsing them
+             * @default true
+             */
+            keepBreaks: boolean;
         };
         DeleteNoteResponse: {
             success: boolean;
@@ -3818,6 +3937,11 @@ export interface components {
             icon?: string | null;
             /** @description Hex color for the icon (e.g., "#FF5733"). Only applies to Lucide icons, not emojis. */
             color?: string | null;
+            /**
+             * @description Preserve extra blank lines as empty paragraphs instead of collapsing them
+             * @default true
+             */
+            keepBreaks: boolean;
         };
         UpdateProjectRequest: {
             /** @description New name for the project */
@@ -3833,6 +3957,11 @@ export interface components {
              * @enum {string}
              */
             state?: "planned" | "completed";
+            /**
+             * @description Preserve extra blank lines as empty paragraphs instead of collapsing them
+             * @default true
+             */
+            keepBreaks: boolean;
         };
         DeleteProjectResponse: {
             success: boolean;
@@ -3896,6 +4025,11 @@ export interface components {
             createdAt: number;
             /** @description End timestamp (Unix seconds) */
             finishedAt: number;
+        };
+        ActivityPaginatedListResponse: {
+            data: components["schemas"]["SessionActivity"][];
+            nextCursor: string | null;
+            hasMore: boolean;
         };
         CreateSessionRequest: {
             /**
@@ -3989,6 +4123,11 @@ export interface components {
              * @enum {string}
              */
             section?: "today" | "sooner" | "later";
+            /**
+             * @description Preserve extra blank lines as empty paragraphs instead of collapsing them
+             * @default true
+             */
+            keepBreaks: boolean;
         };
         UpdateTaskRequest: {
             /** @description Task name */
@@ -4006,6 +4145,11 @@ export interface components {
             waiting?: {
                 reason?: string;
             } | null;
+            /**
+             * @description Preserve extra blank lines as empty paragraphs instead of collapsing them
+             * @default true
+             */
+            keepBreaks: boolean;
         };
         DeleteTaskResponse: {
             success: boolean;

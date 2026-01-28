@@ -108,6 +108,10 @@ export type SessionListParams = NonNullable<
   paths["/sessions"]["get"]["parameters"]["query"]
 >
 
+export type ActivityListParams = NonNullable<
+  paths["/sessions/activities"]["get"]["parameters"]["query"]
+>
+
 export type WebhookListParams = Omit<
   NonNullable<paths["/webhooks"]["get"]["parameters"]["query"]>,
   "isActive"

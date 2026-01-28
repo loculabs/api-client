@@ -169,6 +169,16 @@ const RESOURCES: ResourceConfig[] = [
     listParams: "SessionListParams",
     createRequest: "CreateSessionRequest",
     updateRequest: "UpdateSessionRequest",
+    customMethods: [
+      {
+        name: "listActivities",
+        method: "get",
+        path: "/sessions/activities",
+        description: "List all activities with optional filters",
+        request: "ActivityListParams",
+        response: "PaginatedResponse<SessionActivity>",
+      },
+    ],
     nested: [
       {
         name: "activities",
