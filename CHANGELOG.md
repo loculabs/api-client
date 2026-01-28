@@ -1,3 +1,15 @@
+# [1.4.0](https://github.com/loculabs/api-client/compare/v1.3.0...v1.4.0) (2026-01-28)
+
+
+### Bug Fixes
+
+* **types:** make keepBreaks optional in request types ([7c88e5c](https://github.com/loculabs/api-client/commit/7c88e5cc82954c79e16345e867304610e09ddf22))
+
+
+### Features
+
+* **sessions:** add activities list endpoint ([3a4f267](https://github.com/loculabs/api-client/commit/3a4f26772d37610ba55d2ce8834bcd635dc9ba76))
+
 # [1.3.0](https://github.com/loculabs/api-client/compare/v1.2.0...v1.3.0) (2026-01-27)
 
 
