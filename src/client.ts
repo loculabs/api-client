@@ -22,6 +22,7 @@ import type {
   StopTimerResponse,
   SubtaskListParams,
   Task,
+  TaskDetailResponse,
   TaskListParams,
   TaskSectionsParams,
   TaskSectionsResponse,
@@ -149,7 +150,8 @@ export const createLocuClient = (config: LocuClientConfig) => {
         request("GET", `/tasks${buildQueryString(params)}`),
 
       /** Get a single task by ID */
-      get: (id: string): Promise<Task> => request("GET", `/tasks/${id}`),
+      get: (id: string): Promise<TaskDetailResponse> =>
+        request("GET", `/tasks/${id}`),
 
       /** Create a new task */
       create: (data: CreateTaskRequest): Promise<Task> =>
@@ -238,8 +240,7 @@ export const createLocuClient = (config: LocuClientConfig) => {
         request("GET", `/sessions${buildQueryString(params)}`),
 
       /** Get a single session by ID */
-      get: (id: string): Promise<SessionWithActivities> =>
-        request("GET", `/sessions/${id}`),
+      get: (id: string): Promise<Session> => request("GET", `/sessions/${id}`),
 
       /** Create a new session */
       create: (data: CreateSessionRequest): Promise<Session> =>

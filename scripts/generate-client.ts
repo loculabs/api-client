@@ -48,6 +48,8 @@ interface ResourceConfig {
   createRequest?: string
   updateRequest?: string
   createResponse?: string
+  /** Response type for the get-by-ID endpoint (defaults to entity) */
+  getEntity?: string
   customMethods?: CustomMethod[]
   nested?: NestedResource[]
   /** If true, only generates a single GET method (no CRUD) */
@@ -115,6 +117,7 @@ const RESOURCES: ResourceConfig[] = [
     name: "tasks",
     basePath: "/tasks",
     entity: "Task",
+    getEntity: "TaskDetailResponse",
     listParams: "TaskListParams",
     createRequest: "CreateTaskRequest",
     updateRequest: "UpdateTaskRequest",
@@ -228,6 +231,7 @@ function generateCrudMethods(resource: ResourceConfig): string {
     basePath,
     entity,
     listEntity,
+    getEntity,
     listParams,
     createRequest,
     updateRequest,
@@ -235,6 +239,7 @@ function generateCrudMethods(resource: ResourceConfig): string {
   } = resource
   const lines: string[] = []
   const listType = listEntity || entity
+  const getType = getEntity || entity
   const listParamType = listParams || "PaginationParams"
 
   lines.push(`      /** List all ${resource.name} */`)
@@ -246,7 +251,7 @@ function generateCrudMethods(resource: ResourceConfig): string {
   )
   lines.push("")
   lines.push(`      /** Get a single ${entity.toLowerCase()} by ID */`)
-  lines.push(`      get: (id: string): Promise<${listType}> =>`)
+  lines.push(`      get: (id: string): Promise<${getType}> =>`)
   lines.push(`        request("GET", \`${basePath}/\${id}\`),`)
   lines.push("")
 
@@ -492,6 +497,7 @@ function generateImports(): string {
   for (const resource of RESOURCES) {
     types.add(resource.entity)
     if (resource.listEntity) types.add(resource.listEntity)
+    if (resource.getEntity) types.add(resource.getEntity)
     if (resource.createResponse) types.add(resource.createResponse)
     if (resource.createRequest) types.add(resource.createRequest)
     if (resource.updateRequest) types.add(resource.updateRequest)

@@ -7,6 +7,7 @@ type WithOptionalKeepBreaks<T> = Omit<T, "keepBreaks"> & {
 
 // Tasks
 export type Task = components["schemas"]["Task"]
+export type TaskDetailResponse = components["schemas"]["TaskDetailResponse"]
 export type CreateTaskRequest = WithOptionalKeepBreaks<
   components["schemas"]["CreateTaskRequest"]
 >

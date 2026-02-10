@@ -314,8 +314,9 @@ describe("createLocuClient", () => {
     })
 
     it("should create a session", async () => {
-      const now = Math.floor(Date.now() / 1000)
-      const newSession = { createdAt: now, finishedAt: now + 3600 }
+      const now = new Date().toISOString()
+      const later = new Date(Date.now() + 3600000).toISOString()
+      const newSession = { createdAt: now, finishedAt: later }
       const mockResponse = { id: "1", isManual: true, ...newSession }
       const mockFetch = createMockFetch(mockResponse)
       const client = createLocuClient({ token, fetch: mockFetch })
@@ -340,12 +341,13 @@ describe("createLocuClient", () => {
       })
 
       it("should create an activity", async () => {
-        const now = Math.floor(Date.now() / 1000)
+        const now = new Date().toISOString()
+        const later = new Date(Date.now() + 1800000).toISOString()
         const newActivity = {
           type: "TASK" as const,
           taskId: "task-1",
           createdAt: now,
-          finishedAt: now + 1800,
+          finishedAt: later,
         }
         const mockResponse = {
           id: "1",

@@ -110,6 +110,12 @@ export interface paths {
                     folderId?: string;
                     /** @description Include HTML representation of the note content */
                     includeHtml?: boolean | null;
+                    /** @description Include Markdown representation of the note content */
+                    includeMarkdown?: boolean | null;
+                    /** @description Include plain text representation of the note content */
+                    includePlainText?: boolean | null;
+                    /** @description Include ProseMirror JSON representation of the note content */
+                    includeJson?: boolean | null;
                 };
                 header?: never;
                 path?: never;
@@ -183,6 +189,12 @@ export interface paths {
                 query?: {
                     /** @description Include HTML representation of the note content */
                     includeHtml?: boolean | null;
+                    /** @description Include Markdown representation of the note content */
+                    includeMarkdown?: boolean | null;
+                    /** @description Include plain text representation of the note content */
+                    includePlainText?: boolean | null;
+                    /** @description Include ProseMirror JSON representation of the note content */
+                    includeJson?: boolean | null;
                 };
                 header?: never;
                 path?: never;
@@ -272,6 +284,12 @@ export interface paths {
                 query?: {
                     /** @description Include HTML representation of the note content */
                     includeHtml?: boolean | null;
+                    /** @description Include Markdown representation of the note content */
+                    includeMarkdown?: boolean | null;
+                    /** @description Include plain text representation of the note content */
+                    includePlainText?: boolean | null;
+                    /** @description Include ProseMirror JSON representation of the note content */
+                    includeJson?: boolean | null;
                 };
                 header?: never;
                 path: {
@@ -423,6 +441,12 @@ export interface paths {
                 query?: {
                     /** @description Include HTML representation of the note content */
                     includeHtml?: boolean | null;
+                    /** @description Include Markdown representation of the note content */
+                    includeMarkdown?: boolean | null;
+                    /** @description Include plain text representation of the note content */
+                    includePlainText?: boolean | null;
+                    /** @description Include ProseMirror JSON representation of the note content */
+                    includeJson?: boolean | null;
                 };
                 header?: never;
                 path: {
@@ -511,7 +535,7 @@ export interface paths {
                 query?: {
                     /** @description Number of projects to return */
                     limit?: number;
-                    /** @description Cursor for pagination */
+                    /** @description Cursor for pagination. Use an ISO 8601 datetime cursor when orderBy=createdAt. */
                     cursor?: string;
                     /** @description Field to order results by */
                     orderBy?: "updatedAt" | "createdAt";
@@ -521,6 +545,12 @@ export interface paths {
                     state?: "planned" | "completed";
                     /** @description Include HTML representation of the project description */
                     includeHtml?: boolean | null;
+                    /** @description Include Markdown representation of the project description */
+                    includeMarkdown?: boolean | null;
+                    /** @description Include plain text representation of the project description */
+                    includePlainText?: boolean | null;
+                    /** @description Include ProseMirror JSON representation of the project description */
+                    includeJson?: boolean | null;
                 };
                 header?: never;
                 path?: never;
@@ -594,6 +624,12 @@ export interface paths {
                 query?: {
                     /** @description Include HTML representation of the project description */
                     includeHtml?: boolean | null;
+                    /** @description Include Markdown representation of the project description */
+                    includeMarkdown?: boolean | null;
+                    /** @description Include plain text representation of the project description */
+                    includePlainText?: boolean | null;
+                    /** @description Include ProseMirror JSON representation of the project description */
+                    includeJson?: boolean | null;
                 };
                 header?: never;
                 path?: never;
@@ -683,6 +719,12 @@ export interface paths {
                 query?: {
                     /** @description Include HTML representation of the project description */
                     includeHtml?: boolean | null;
+                    /** @description Include Markdown representation of the project description */
+                    includeMarkdown?: boolean | null;
+                    /** @description Include plain text representation of the project description */
+                    includePlainText?: boolean | null;
+                    /** @description Include ProseMirror JSON representation of the project description */
+                    includeJson?: boolean | null;
                 };
                 header?: never;
                 path: {
@@ -834,6 +876,12 @@ export interface paths {
                 query?: {
                     /** @description Include HTML representation of the project description */
                     includeHtml?: boolean | null;
+                    /** @description Include Markdown representation of the project description */
+                    includeMarkdown?: boolean | null;
+                    /** @description Include plain text representation of the project description */
+                    includePlainText?: boolean | null;
+                    /** @description Include ProseMirror JSON representation of the project description */
+                    includeJson?: boolean | null;
                 };
                 header?: never;
                 path: {
@@ -922,15 +970,15 @@ export interface paths {
                 query?: {
                     /** @description Number of sessions to return */
                     limit?: number;
-                    /** @description Cursor for pagination */
+                    /** @description Cursor for pagination. Use ISO 8601 datetime cursors when orderBy is createdAt or finishedAt. */
                     cursor?: string;
                     /** @description Field to order results by */
                     orderBy?: "updatedAt" | "createdAt" | "finishedAt";
                     /** @description Sort order (ascending or descending) */
                     order?: "asc" | "desc";
-                    /** @description Filter sessions starting after this date (Unix seconds or ISO 8601) */
+                    /** @description Filter sessions starting after this date (ISO 8601) */
                     startAfter?: string;
-                    /** @description Filter sessions starting before this date (Unix seconds or ISO 8601) */
+                    /** @description Filter sessions starting before this date (ISO 8601) */
                     startBefore?: string;
                     /** @description Include activities in response */
                     includeActivities?: boolean | null;
@@ -1093,7 +1141,7 @@ export interface paths {
                 query?: {
                     /** @description Number of activities to return */
                     limit?: number;
-                    /** @description Cursor for pagination */
+                    /** @description Cursor for pagination. Use an ISO 8601 datetime cursor when orderBy=createdAt. */
                     cursor?: string;
                     /** @description Field to order results by */
                     orderBy?: "updatedAt" | "createdAt";
@@ -1749,7 +1797,7 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    /** @description Cursor for pagination */
+                    /** @description Cursor for pagination. Use an ISO 8601 datetime cursor when ordering by doneAt. */
                     cursor?: string;
                     /** @description Number of items to return (max 100) */
                     limit?: string;
@@ -1765,12 +1813,18 @@ export interface paths {
                     parentId?: string;
                     /** @description Filter by section */
                     section?: "today" | "sooner" | "later";
-                    /** @description Filter tasks completed after this date (Unix seconds or ISO 8601) */
+                    /** @description Filter tasks completed after this date (ISO 8601) */
                     doneAfter?: string;
-                    /** @description Filter tasks completed before this date (Unix seconds or ISO 8601) */
+                    /** @description Filter tasks completed before this date (ISO 8601) */
                     doneBefore?: string;
                     /** @description Include HTML representation of the task description */
                     includeHtml?: boolean | null;
+                    /** @description Include Markdown representation of the task description */
+                    includeMarkdown?: boolean | null;
+                    /** @description Include plain text representation of the task description */
+                    includePlainText?: boolean | null;
+                    /** @description Include ProseMirror JSON representation of the task description */
+                    includeJson?: boolean | null;
                 };
                 header?: never;
                 path?: never;
@@ -1844,6 +1898,12 @@ export interface paths {
                 query?: {
                     /** @description Include HTML representation of the task description */
                     includeHtml?: boolean | null;
+                    /** @description Include Markdown representation of the task description */
+                    includeMarkdown?: boolean | null;
+                    /** @description Include plain text representation of the task description */
+                    includePlainText?: boolean | null;
+                    /** @description Include ProseMirror JSON representation of the task description */
+                    includeJson?: boolean | null;
                 };
                 header?: never;
                 path?: never;
@@ -1935,6 +1995,12 @@ export interface paths {
                     section?: "today" | "sooner" | "later";
                     /** @description Include HTML representation of the task description */
                     includeHtml?: boolean | null;
+                    /** @description Include Markdown representation of the task description */
+                    includeMarkdown?: boolean | null;
+                    /** @description Include plain text representation of the task description */
+                    includePlainText?: boolean | null;
+                    /** @description Include ProseMirror JSON representation of the task description */
+                    includeJson?: boolean | null;
                 };
                 header?: never;
                 path?: never;
@@ -2015,13 +2081,19 @@ export interface paths {
         };
         /**
          * Get task
-         * @description Retrieve a single task by ID.
+         * @description Retrieve a single task by ID with section, description, and subtask tree.
          */
         get: {
             parameters: {
                 query?: {
                     /** @description Include HTML representation of the task description */
                     includeHtml?: boolean | null;
+                    /** @description Include Markdown representation of the task description */
+                    includeMarkdown?: boolean | null;
+                    /** @description Include plain text representation of the task description */
+                    includePlainText?: boolean | null;
+                    /** @description Include ProseMirror JSON representation of the task description */
+                    includeJson?: boolean | null;
                 };
                 header?: never;
                 path: {
@@ -2038,7 +2110,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Task"];
+                        "application/json": components["schemas"]["TaskDetailResponse"];
                     };
                 };
                 /** @description Bad request - validation error */
@@ -2173,6 +2245,12 @@ export interface paths {
                 query?: {
                     /** @description Include HTML representation of the task description */
                     includeHtml?: boolean | null;
+                    /** @description Include Markdown representation of the task description */
+                    includeMarkdown?: boolean | null;
+                    /** @description Include plain text representation of the task description */
+                    includePlainText?: boolean | null;
+                    /** @description Include ProseMirror JSON representation of the task description */
+                    includeJson?: boolean | null;
                 };
                 header?: never;
                 path: {
@@ -2267,6 +2345,12 @@ export interface paths {
                     done?: "true" | "false";
                     /** @description Include HTML representation of the task description */
                     includeHtml?: boolean | null;
+                    /** @description Include Markdown representation of the task description */
+                    includeMarkdown?: boolean | null;
+                    /** @description Include plain text representation of the task description */
+                    includePlainText?: boolean | null;
+                    /** @description Include ProseMirror JSON representation of the task description */
+                    includeJson?: boolean | null;
                 };
                 header?: never;
                 path: {
@@ -3417,15 +3501,28 @@ export interface components {
             id: string;
             name: string;
             done: "completed" | "canceled" | null;
-            doneAt: number | null;
-            createdAt: number;
+            /**
+             * Format: date-time
+             * @description Completion timestamp (ISO 8601)
+             */
+            doneAt: string | null;
+            /**
+             * Format: date-time
+             * @description Creation timestamp (ISO 8601)
+             */
+            createdAt: string;
             parent: {
                 id: string;
                 order: number | null;
             } | null;
+            /** @description Task waiting state */
             waiting?: {
                 reason?: string;
-                waitingAt: number;
+                /**
+                 * Format: date-time
+                 * @description Timestamp when task entered waiting state (ISO 8601)
+                 */
+                waitingAt: string;
             } | null;
             projectId?: string | null;
             cursorAgentUrl?: string | null;
@@ -3438,12 +3535,12 @@ export interface components {
             type: "locu";
             /** @description Task description in multiple formats */
             description?: {
-                /** @description Description content as Markdown */
-                markdown: string;
-                /** @description Description content as HTML (only included when includeHtml=true) */
+                /** @description Description content as Markdown (included when includeMarkdown=true) */
+                markdown?: string;
+                /** @description Description content as HTML (included when includeHtml=true) */
                 html?: string;
                 /**
-                 * @description Description content as ProseMirror JSON document
+                 * @description Description content as ProseMirror JSON document (included when includeJson=true)
                  * @example {
                  *       "type": "doc",
                  *       "content": [
@@ -3497,23 +3594,36 @@ export interface components {
                         }[];
                     }[];
                 };
-                /** @description Description content as plain text */
-                plainText: string;
+                /** @description Description content as plain text (included when includePlainText=true) */
+                plainText?: string;
             } | null;
         };
         LinearTask: {
             id: string;
             name: string;
             done: "completed" | "canceled" | null;
-            doneAt: number | null;
-            createdAt: number;
+            /**
+             * Format: date-time
+             * @description Completion timestamp (ISO 8601)
+             */
+            doneAt: string | null;
+            /**
+             * Format: date-time
+             * @description Creation timestamp (ISO 8601)
+             */
+            createdAt: string;
             parent: {
                 id: string;
                 order: number | null;
             } | null;
+            /** @description Task waiting state */
             waiting?: {
                 reason?: string;
-                waitingAt: number;
+                /**
+                 * Format: date-time
+                 * @description Timestamp when task entered waiting state (ISO 8601)
+                 */
+                waitingAt: string;
             } | null;
             projectId?: string | null;
             cursorAgentUrl?: string | null;
@@ -3524,12 +3634,12 @@ export interface components {
             teamId: string;
             /** @description Task description in multiple formats */
             description?: {
-                /** @description Description content as Markdown */
-                markdown: string;
-                /** @description Description content as HTML (only included when includeHtml=true) */
+                /** @description Description content as Markdown (included when includeMarkdown=true) */
+                markdown?: string;
+                /** @description Description content as HTML (included when includeHtml=true) */
                 html?: string;
                 /**
-                 * @description Description content as ProseMirror JSON document
+                 * @description Description content as ProseMirror JSON document (included when includeJson=true)
                  * @example {
                  *       "type": "doc",
                  *       "content": [
@@ -3583,8 +3693,8 @@ export interface components {
                         }[];
                     }[];
                 };
-                /** @description Description content as plain text */
-                plainText: string;
+                /** @description Description content as plain text (included when includePlainText=true) */
+                plainText?: string;
             } | null;
             assignee: {
                 id: string;
@@ -3602,32 +3712,46 @@ export interface components {
              * @enum {string}
              */
             type: "linear";
+            integrationDescription: string;
         };
         JiraTask: {
             id: string;
             name: string;
             done: "completed" | "canceled" | null;
-            doneAt: number | null;
-            createdAt: number;
+            /**
+             * Format: date-time
+             * @description Completion timestamp (ISO 8601)
+             */
+            doneAt: string | null;
+            /**
+             * Format: date-time
+             * @description Creation timestamp (ISO 8601)
+             */
+            createdAt: string;
             parent: {
                 id: string;
                 order: number | null;
             } | null;
+            /** @description Task waiting state */
             waiting?: {
                 reason?: string;
-                waitingAt: number;
+                /**
+                 * Format: date-time
+                 * @description Timestamp when task entered waiting state (ISO 8601)
+                 */
+                waitingAt: string;
             } | null;
             projectId: string;
             cursorAgentUrl?: string | null;
             integrationId: string;
             /** @description Task description in multiple formats */
             description?: {
-                /** @description Description content as Markdown */
-                markdown: string;
-                /** @description Description content as HTML (only included when includeHtml=true) */
+                /** @description Description content as Markdown (included when includeMarkdown=true) */
+                markdown?: string;
+                /** @description Description content as HTML (included when includeHtml=true) */
                 html?: string;
                 /**
-                 * @description Description content as ProseMirror JSON document
+                 * @description Description content as ProseMirror JSON document (included when includeJson=true)
                  * @example {
                  *       "type": "doc",
                  *       "content": [
@@ -3681,8 +3805,8 @@ export interface components {
                         }[];
                     }[];
                 };
-                /** @description Description content as plain text */
-                plainText: string;
+                /** @description Description content as plain text (included when includePlainText=true) */
+                plainText?: string;
             } | null;
             assignee: {
                 id: string;
@@ -3712,7 +3836,24 @@ export interface components {
              * @enum {string}
              */
             type: "jira";
+            integrationDescription: string;
         };
+        TaskDetailResponse: components["schemas"]["Task"] & {
+            /**
+             * @description Section the task belongs to
+             * @enum {string|null}
+             */
+            section: "today" | "sooner" | "later" | null;
+            /** @description Subtask tree with descriptions */
+            subtasks?: components["schemas"]["SubTask"][];
+        };
+        SubTask: (components["schemas"]["LocuTask"] & {
+            subtasks?: unknown[];
+        }) | (components["schemas"]["LinearTask"] & {
+            subtasks?: unknown[];
+        }) | (components["schemas"]["JiraTask"] & {
+            subtasks?: unknown[];
+        });
         MeResponse: {
             /** @description Email of the authenticated user */
             email: string;
@@ -3742,14 +3883,22 @@ export interface components {
                 id: string;
                 type: "folder" | "virtual-folder";
             } | null;
-            createdAt?: number;
-            updatedAt?: number;
-            /** @description Note content as Markdown */
-            markdown: string;
-            /** @description Note content as HTML (only included when includeHtml=true) */
+            /**
+             * Format: date-time
+             * @description Creation timestamp (ISO 8601)
+             */
+            createdAt?: string;
+            /**
+             * Format: date-time
+             * @description Last update timestamp (ISO 8601)
+             */
+            updatedAt?: string;
+            /** @description Note content as Markdown (included when includeMarkdown=true) */
+            markdown?: string;
+            /** @description Note content as HTML (included when includeHtml=true) */
             html?: string;
             /**
-             * @description Note content as ProseMirror JSON document
+             * @description Note content as ProseMirror JSON document (included when includeJson=true)
              * @example {
              *       "type": "doc",
              *       "content": [
@@ -3803,8 +3952,8 @@ export interface components {
                     }[];
                 }[];
             };
-            /** @description Note content as plain text */
-            plainText: string;
+            /** @description Note content as plain text (included when includePlainText=true) */
+            plainText?: string;
         };
         CreateNoteRequest: {
             /**
@@ -3854,18 +4003,31 @@ export interface components {
             name: string;
             icon: string | null;
             color: string | null;
-            state: "planned" | "completed";
-            completedAt?: number | null;
-            createdAt: number;
-            updatedAt: number;
+            state: "planned" | "completed" | "canceled";
+            /**
+             * Format: date-time
+             * @description Completion timestamp (ISO 8601)
+             */
+            completedAt?: string | null;
+            canceledAt?: number | null;
+            /**
+             * Format: date-time
+             * @description Creation timestamp (ISO 8601)
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Last update timestamp (ISO 8601)
+             */
+            updatedAt: string;
             /** @description Project description in multiple formats */
             description?: {
-                /** @description Description content as Markdown */
-                markdown: string;
-                /** @description Description content as HTML (only included when includeHtml=true) */
+                /** @description Description content as Markdown (included when includeMarkdown=true) */
+                markdown?: string;
+                /** @description Description content as HTML (included when includeHtml=true) */
                 html?: string;
                 /**
-                 * @description Description content as ProseMirror JSON document
+                 * @description Description content as ProseMirror JSON document (included when includeJson=true)
                  * @example {
                  *       "type": "doc",
                  *       "content": [
@@ -3919,8 +4081,8 @@ export interface components {
                         }[];
                     }[];
                 };
-                /** @description Description content as plain text */
-                plainText: string;
+                /** @description Description content as plain text (included when includePlainText=true) */
+                plainText?: string;
             } | null;
         };
         CreateProjectRequest: {
@@ -3976,42 +4138,115 @@ export interface components {
             activities: components["schemas"]["SessionActivity"][];
         };
         SessionActivity: {
+            /**
+             * Format: uuid
+             * @description Unique identifier for the activity
+             */
+            id: string;
+            /**
+             * Format: date-time
+             * @description Activity start timestamp (ISO 8601)
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Activity end timestamp (ISO 8601)
+             */
+            finishedAt: string;
+            /**
+             * Format: uuid
+             * @description Session ID this activity belongs to
+             */
+            sessionId: string;
+            /** @description Whether the activity was manually created */
+            isManual: boolean;
             /** @enum {string} */
             type: "TASK";
+            /** @description Associated task ID */
             taskId: string;
-            id: string;
-            createdAt: number;
-            finishedAt: number;
-            sessionId: string;
-            isManual: boolean;
         } | {
+            /**
+             * Format: uuid
+             * @description Unique identifier for the activity
+             */
+            id: string;
+            /**
+             * Format: date-time
+             * @description Activity start timestamp (ISO 8601)
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Activity end timestamp (ISO 8601)
+             */
+            finishedAt: string;
+            /**
+             * Format: uuid
+             * @description Session ID this activity belongs to
+             */
+            sessionId: string;
+            /** @description Whether the activity was manually created */
+            isManual: boolean;
             /** @enum {string} */
             type: "MEETING";
+            /** @description Meeting title */
             title: string;
-            htmlLink: string;
+            /** @description Meeting URL */
+            htmlLink?: string;
+            /** @description Meeting identifier */
             meetingId: string;
+            /** @description Calendar identifier */
             calendarId?: string;
-            id: string;
-            createdAt: number;
-            finishedAt: number;
-            sessionId: string;
-            isManual: boolean;
         } | {
+            /**
+             * Format: uuid
+             * @description Unique identifier for the activity
+             */
+            id: string;
+            /**
+             * Format: date-time
+             * @description Activity start timestamp (ISO 8601)
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Activity end timestamp (ISO 8601)
+             */
+            finishedAt: string;
+            /**
+             * Format: uuid
+             * @description Session ID this activity belongs to
+             */
+            sessionId: string;
+            /** @description Whether the activity was manually created */
+            isManual: boolean;
             /** @enum {string} */
             type: "PLANNING";
-            id: string;
-            createdAt: number;
-            finishedAt: number;
-            sessionId: string;
-            isManual: boolean;
         } | {
+            /**
+             * Format: uuid
+             * @description Unique identifier for the activity
+             */
+            id: string;
+            /**
+             * Format: date-time
+             * @description Activity start timestamp (ISO 8601)
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Activity end timestamp (ISO 8601)
+             */
+            finishedAt: string;
+            /**
+             * Format: uuid
+             * @description Session ID this activity belongs to
+             */
+            sessionId: string;
+            /** @description Whether the activity was manually created */
+            isManual: boolean;
             /** @enum {string} */
             type: "WRAP_UP";
-            id: string;
-            createdAt: number;
-            finishedAt: number;
-            sessionId: string;
-            isManual: boolean;
         };
         Session: {
             /**
@@ -4021,10 +4256,16 @@ export interface components {
             id: string;
             /** @description Whether the session was manually created */
             isManual: boolean;
-            /** @description Start timestamp (Unix seconds) */
-            createdAt: number;
-            /** @description End timestamp (Unix seconds) */
-            finishedAt: number;
+            /**
+             * Format: date-time
+             * @description Session start timestamp (ISO 8601)
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Session end timestamp (ISO 8601)
+             */
+            finishedAt: string;
         };
         ActivityPaginatedListResponse: {
             data: components["schemas"]["SessionActivity"][];
@@ -4037,16 +4278,28 @@ export interface components {
              * @description Optional custom ID for the session
              */
             id?: string;
-            /** @description Start timestamp (Unix seconds) */
-            createdAt: number;
-            /** @description End timestamp (Unix seconds) */
-            finishedAt: number;
+            /**
+             * Format: date-time
+             * @description Session start timestamp (ISO 8601)
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Session end timestamp (ISO 8601)
+             */
+            finishedAt: string;
         };
         UpdateSessionRequest: {
-            /** @description New start timestamp (Unix seconds) */
-            createdAt?: number;
-            /** @description New end timestamp (Unix seconds) */
-            finishedAt?: number;
+            /**
+             * Format: date-time
+             * @description New session start timestamp (ISO 8601)
+             */
+            createdAt?: string;
+            /**
+             * Format: date-time
+             * @description New session end timestamp (ISO 8601)
+             */
+            finishedAt?: string;
         };
         DeleteSessionResponse: {
             success: boolean;
@@ -4061,16 +4314,28 @@ export interface components {
             type: "TASK";
             /** @description Associated task ID */
             taskId: string;
-            /** @description Start timestamp (Unix seconds) */
-            createdAt: number;
-            /** @description End timestamp (Unix seconds) */
-            finishedAt: number;
+            /**
+             * Format: date-time
+             * @description Activity start timestamp (ISO 8601)
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Activity end timestamp (ISO 8601)
+             */
+            finishedAt: string;
         };
         UpdateActivityRequest: {
-            /** @description New start timestamp (Unix seconds) */
-            createdAt?: number;
-            /** @description New end timestamp (Unix seconds) */
-            finishedAt?: number;
+            /**
+             * Format: date-time
+             * @description New activity start timestamp (ISO 8601)
+             */
+            createdAt?: string;
+            /**
+             * Format: date-time
+             * @description New activity end timestamp (ISO 8601)
+             */
+            finishedAt?: string;
         };
         DeleteActivityResponse: {
             success: boolean;
@@ -4164,8 +4429,8 @@ export interface components {
             duration?: number;
             /** @description ID of the task being worked on (only present when ACTIVE with a task) */
             currentTaskId?: string;
-            /** @description When the timer was started as Unix timestamp in seconds (only present when not IDLE) */
-            startedAt?: number;
+            /** @description When the timer was started as an ISO 8601 datetime (only present when not IDLE) */
+            startedAt?: string;
         };
         StartTimerRequest: {
             /** @description Duration in seconds (must be positive) */
@@ -4182,10 +4447,16 @@ export interface components {
             id: string;
             /** @description Whether the session was manually created */
             isManual: boolean;
-            /** @description Start timestamp (Unix seconds) */
-            createdAt: number;
-            /** @description End timestamp (Unix seconds) */
-            finishedAt: number;
+            /**
+             * Format: date-time
+             * @description Start timestamp (ISO 8601)
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description End timestamp (ISO 8601)
+             */
+            finishedAt: string;
         };
         WebhookListResponse: {
             data: components["schemas"]["Webhook"][];
