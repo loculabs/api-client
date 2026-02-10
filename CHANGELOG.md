@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/loculabs/api-client/compare/v2.0.0...v2.1.0) (2026-02-10)
+
+
+### Features
+
+* add optional query params to get-by-ID endpoints for tasks, projects, and notes ([f0c3cea](https://github.com/loculabs/api-client/commit/f0c3ceaa0248ddb2550fdc4592d6f91805ef749d))
+
 # [2.0.0](https://github.com/loculabs/api-client/compare/v1.4.0...v2.0.0) (2026-02-10)
 
 
