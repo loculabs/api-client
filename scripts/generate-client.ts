@@ -50,6 +50,8 @@ interface ResourceConfig {
   createResponse?: string
   /** Response type for the get-by-ID endpoint (defaults to entity) */
   getEntity?: string
+  /** Query params type for the get-by-ID endpoint */
+  getParams?: string
   customMethods?: CustomMethod[]
   nested?: NestedResource[]
   /** If true, only generates a single GET method (no CRUD) */
@@ -118,6 +120,7 @@ const RESOURCES: ResourceConfig[] = [
     basePath: "/tasks",
     entity: "Task",
     getEntity: "TaskDetailResponse",
+    getParams: "GetTaskParams",
     listParams: "TaskListParams",
     createRequest: "CreateTaskRequest",
     updateRequest: "UpdateTaskRequest",
@@ -152,6 +155,7 @@ const RESOURCES: ResourceConfig[] = [
     name: "projects",
     basePath: "/projects",
     entity: "Project",
+    getParams: "GetProjectParams",
     listParams: "ProjectListParams",
     createRequest: "CreateProjectRequest",
     updateRequest: "UpdateProjectRequest",
@@ -160,6 +164,7 @@ const RESOURCES: ResourceConfig[] = [
     name: "notes",
     basePath: "/notes",
     entity: "Note",
+    getParams: "GetNoteParams",
     listParams: "NoteListParams",
     createRequest: "CreateNoteRequest",
     updateRequest: "UpdateNoteRequest",
@@ -232,6 +237,7 @@ function generateCrudMethods(resource: ResourceConfig): string {
     entity,
     listEntity,
     getEntity,
+    getParams,
     listParams,
     createRequest,
     updateRequest,
@@ -251,8 +257,17 @@ function generateCrudMethods(resource: ResourceConfig): string {
   )
   lines.push("")
   lines.push(`      /** Get a single ${entity.toLowerCase()} by ID */`)
-  lines.push(`      get: (id: string): Promise<${getType}> =>`)
-  lines.push(`        request("GET", \`${basePath}/\${id}\`),`)
+  if (getParams) {
+    lines.push(
+      `      get: (id: string, params?: ${getParams}): Promise<${getType}> =>`
+    )
+    lines.push(
+      `        request("GET", \`${basePath}/\${id}\${buildQueryString(params ?? {})}\`),`
+    )
+  } else {
+    lines.push(`      get: (id: string): Promise<${getType}> =>`)
+    lines.push(`        request("GET", \`${basePath}/\${id}\`),`)
+  }
   lines.push("")
 
   if (createRequest) {
@@ -498,6 +513,7 @@ function generateImports(): string {
     types.add(resource.entity)
     if (resource.listEntity) types.add(resource.listEntity)
     if (resource.getEntity) types.add(resource.getEntity)
+    if (resource.getParams) types.add(resource.getParams)
     if (resource.createResponse) types.add(resource.createResponse)
     if (resource.createRequest) types.add(resource.createRequest)
     if (resource.updateRequest) types.add(resource.updateRequest)

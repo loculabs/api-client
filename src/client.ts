@@ -7,6 +7,9 @@ import type {
   CreateSessionRequest,
   CreateTaskRequest,
   CreateWebhookRequest,
+  GetNoteParams,
+  GetProjectParams,
+  GetTaskParams,
   MeResponse,
   Note,
   NoteListParams,
@@ -150,8 +153,8 @@ export const createLocuClient = (config: LocuClientConfig) => {
         request("GET", `/tasks${buildQueryString(params)}`),
 
       /** Get a single task by ID */
-      get: (id: string): Promise<TaskDetailResponse> =>
-        request("GET", `/tasks/${id}`),
+      get: (id: string, params?: GetTaskParams): Promise<TaskDetailResponse> =>
+        request("GET", `/tasks/${id}${buildQueryString(params ?? {})}`),
 
       /** Create a new task */
       create: (data: CreateTaskRequest): Promise<Task> =>
@@ -194,7 +197,8 @@ export const createLocuClient = (config: LocuClientConfig) => {
         request("GET", `/projects${buildQueryString(params)}`),
 
       /** Get a single project by ID */
-      get: (id: string): Promise<Project> => request("GET", `/projects/${id}`),
+      get: (id: string, params?: GetProjectParams): Promise<Project> =>
+        request("GET", `/projects/${id}${buildQueryString(params ?? {})}`),
 
       /** Create a new project */
       create: (data: CreateProjectRequest): Promise<Project> =>
@@ -216,7 +220,8 @@ export const createLocuClient = (config: LocuClientConfig) => {
         request("GET", `/notes${buildQueryString(params)}`),
 
       /** Get a single note by ID */
-      get: (id: string): Promise<Note> => request("GET", `/notes/${id}`),
+      get: (id: string, params?: GetNoteParams): Promise<Note> =>
+        request("GET", `/notes/${id}${buildQueryString(params ?? {})}`),
 
       /** Create a new note */
       create: (data: CreateNoteRequest): Promise<Note> =>

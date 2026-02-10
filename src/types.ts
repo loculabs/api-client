@@ -18,6 +18,9 @@ export type TaskSectionsResponse = components["schemas"]["TaskSectionsResponse"]
 
 // Projects
 export type Project = components["schemas"]["Project"]
+export type GetProjectParams = NonNullable<
+  paths["/projects/{id}"]["get"]["parameters"]["query"]
+>
 export type CreateProjectRequest = WithOptionalKeepBreaks<
   components["schemas"]["CreateProjectRequest"]
 >
@@ -27,6 +30,9 @@ export type UpdateProjectRequest = WithOptionalKeepBreaks<
 
 // Notes
 export type Note = components["schemas"]["Note"]
+export type GetNoteParams = NonNullable<
+  paths["/notes/{id}"]["get"]["parameters"]["query"]
+>
 export type CreateNoteRequest = WithOptionalKeepBreaks<
   components["schemas"]["CreateNoteRequest"]
 >
@@ -104,6 +110,10 @@ export type TaskListParams = Omit<
 
 export type TaskSectionsParams = NonNullable<
   paths["/tasks/sections"]["get"]["parameters"]["query"]
+>
+
+export type GetTaskParams = NonNullable<
+  paths["/tasks/{id}"]["get"]["parameters"]["query"]
 >
 
 export type SubtaskListParams = Omit<
