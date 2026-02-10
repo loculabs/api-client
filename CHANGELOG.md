@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/loculabs/api-client/compare/v1.4.0...v2.0.0) (2026-02-10)
+
+
+* feat!: change date fields from epoch seconds to ISO 8601 strings ([ba33f55](https://github.com/loculabs/api-client/commit/ba33f55a94b9afe5ad48464dd344b2da96548672))
+
+
+### BREAKING CHANGES
+
+* Date fields changed from number (epoch seconds) to string (ISO 8601).
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+
 # [1.4.0](https://github.com/loculabs/api-client/compare/v1.3.0...v1.4.0) (2026-01-28)
 
 
